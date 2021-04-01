@@ -47,13 +47,13 @@ function preload() {
   centerWidth = floor(windowWidth * 0.7);
   centerHeight = floor(windowHeight * 0.25);
 
-  trashWidth = floor(centerWidth * 0.4);
-  trashHeight = floor(centerHeight * 0.7);
+  trashWidth = floor(cardWidth + cardWidth * 0.8);
+  trashHeight = floor(cardHeight + cardHeight * 0.8 * 0.7);
   trashX = floor(centerX - centerX * 0.35);
   trashY = floor(centerY);
 
-  deckWidth = floor(centerWidth * 0.4);
-  deckHeight = floor(centerHeight * 0.7);
+  deckWidth = floor(cardWidth + cardWidth * 0.8);
+  deckHeight = floor(cardHeight + cardHeight * 0.8 * 0.7);
   deckX = floor(centerX + centerX * 0.35);
   deckY = floor(centerY);
 
@@ -90,10 +90,9 @@ function preload() {
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
-
   backCardImage = loadImage(`cards/gray_back.png`);
 
-  initializeDeck(["2C", "3H", "6S", "7D", "7D", "7D"]);
+  initializeDeck(["2C", "3H", "6S", "7C", "7D", "7S"]);
 }
 
 function initializeDeck(cardCodes) {
@@ -120,41 +119,37 @@ function initializeDeck(cardCodes) {
 }
 
 function draw() {
-  background(0);
+  background(color("green"));
 
-  //Draw Bottom Background
-  fill(255);
+  // BOTTOM
+  fill(1, 99, 15);
   noStroke();
   rectMode(CORNER);
   rect(0, bottomY, windowWidth, bottomHeight);
 
   // Draw center background
-  rectMode(CENTER);
-  rect(centerX, centerY, centerWidth, centerHeight);
+  // rectMode(CENTER);
+  // rect(centerX, centerY, centerWidth, centerHeight);
 
-  // draw trash background
+  // TRASH
+  fill(1, 99, 15);
   if (cardIsOverTrash) {
-    rectMode(CENTER);
-    fill(127);
-    stroke(255, 0, 0);
-    rect(trashX, trashY, trashWidth, trashHeight);
-  } else {
-    rectMode(CENTER);
-    fill(127);
-    rect(trashX, trashY, trashWidth, trashHeight);
+    strokeWeight(3)
+    stroke(255);
+    fill(15, 77, 24);
   }
+  rectMode(CENTER);
+  rect(trashX, trashY, trashWidth, trashHeight);
 
-  //Draw card trash
   for (const card of trash) {
     card.display();
   }
 
-  // draw deck background
+  // DECK
   rectMode(CENTER);
   noStroke();
-  fill(107);
+  fill(1, 99, 15);
   rect(deckX, deckY, deckWidth, deckHeight);
-
   image(
     backCardImage,
     deckX - deckWidth / 2 + (deckWidth - cardWidth) / 2,
@@ -163,6 +158,7 @@ function draw() {
     cardHeight
   );
 
+  // CARDS
   for (const card of deck) {
     card.display();
   }
@@ -210,8 +206,8 @@ function isOverTrash(x, y) {
 }
 
 function mouseReleased() {
-  isCardOverTrash();
   isCardOverBottomBondaries();
+  isCardOverTrash();
 
   cardLockedIndex = undefined;
   cardIsOverTrash = false;
@@ -221,7 +217,10 @@ function mouseReleased() {
 function isCardOverTrash() {
   if (cardIsOverTrash) {
     card = deck[cardLockedIndex];
-    card.setPosition(trashX, trashY);
+    card.setPosition(
+      trashX - trashWidth / 2 + (trashWidth - cardWidth) / 2,
+      trashY - trashHeight / 2 + (trashHeight - cardHeight) / 2
+    );
 
     trash.push(card);
     deck.splice(cardLockedIndex, 1);
@@ -234,7 +233,6 @@ function isCardOverBottomBondaries() {
 
     x = card.v.x;
     y = card.v.y;
-    console.log(x, y);
 
     if (
       x >= 0 &&

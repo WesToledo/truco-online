@@ -1,0 +1,24 @@
+{
+  "name": "truco-online",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WesToledo/truco-online.git"
+  },
+  "author": "Wesley Toledo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/WesToledo/truco-online/issues"
+  },
+  "homepage": "https://github.com/WesToledo/truco-online#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "http": "0.0.1-security"
+  }
+}
