@@ -28,9 +28,9 @@
 //   this.cards[i] = card;
 // };
 
-
-function Card(w, h, img, value, naipe) {
-  this.v = new createVector(0, 500);
+function Card(x, y, w, h, img, value, naipe) {
+  this.v = new createVector(x, y);
+  this.previousPosition = new createVector(x, y);
   this.width = w;
   this.height = h;
 
@@ -60,3 +60,12 @@ Card.prototype.setY = function (y) {
   this.v.y = y;
 };
 
+Card.prototype.setPosition = function (x, y) {
+  this.v.x = x;
+  this.v.y = y;
+};
+
+Card.prototype.setPreviousPosition = function () {
+  this.previousPosition.x = this.v.x;
+  this.previousPosition.y = this.v.y;
+};
