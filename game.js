@@ -3,33 +3,36 @@ function createGame() {
     open: false,
     players: {
       someId: {
-        name: "Wesley"
-      }
+        name: "Wesley",
+        lives: 2,
+      },
     },
-    playersLives: {
-      someId: {
-        count: 2,
-    },
-  },
-    playersActives: {},
     currentRound: 1,
-    rounds: [],
-    countCards: 1,
+    rounds: [
+      {
+        players: {
+          someId: {
+            name: "Wesley",
+            cards: [],
+            move: false,
+          },
+        },
+        joker: {},
+        deck: [],
+        trash: [
+          {
+            card: "2C",
+            playerId: "some id",
+          },
+        ],
+        firstPlayer: { idPlayer: "some id" },
+        lastPlayer: { idPlayer: "other id" },
+      },
+    ],
+    currentPlayer: { playerId: playerId },
+    currentRoundCartAmount: 1,
     lastPlayerLastGame: {},
-    currentPlayer: {},
-    deck = [],
-    joker = {},
-    trash=[]
-
   };
-
-  const round = {
-    firstPlayer: {},
-    countCards:1,
-    playersAnswers: {},
-
-  }
-
 
   const observers = [];
 
