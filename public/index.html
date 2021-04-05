@@ -2,19 +2,34 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Truco Online</title>
 
-    <link rel="stylesheet" type="text/css" href="style.css">
-
-    <script src="libraries/p5.min.js"></script>
-    <script src="libraries/p5.sound.min.js"></script>
-    
-    <script src="Card.js"></script>
+    <script type="text/javascript">
+      let PLAYER_KEY = "PLAYER_KEY";
+      if (window.localStorage.getItem(PLAYER_KEY))
+        location.replace("/game.html");
+    </script>
   </head>
 
   <body>
-    <script src="sketch.js"></script>
+    <form id="form">
+      <input type="text" name="name" />
+      <input type="submit" title="Começar" />
+    </form>
+
+    <script type="text/javascript">
+      var form = document.getElementById("form");
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        var name = form.elements["name"].value;
+
+        window.localStorage.setItem(PLAYER_KEY, name);
+
+        console.log(name);
+      });
+    </script>
   </body>
 </html>
