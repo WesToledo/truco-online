@@ -1,4 +1,4 @@
-function createGame() {
+export function createGame() {
   const state = {
     init: false,
     players: {
@@ -32,7 +32,7 @@ function createGame() {
     ],
     currentPlayer: { playerId: playerId },
     currentRoundCartAmount: 1,
-    maxCardAmount: 8,
+    maxRoundCardAmount: 8,
     lastPlayerLastGame: {},
   };
 
@@ -106,12 +106,19 @@ function createGame() {
   }
 
   function createNewRound() {
+    let newRound = new Round();
 
-    const playersId = Object.keys(state.players).filter(
+    // select only the players that are playing (lives > 0)
+    const playersAlivesId = Object.keys(state.players).filter(
       (playerId) => state.players[playerId].lives > 0
     );
 
-    playersId.forEach(playersId)
+    calculateAndSetMaxRoundCardAmount(playersAlivesId.length);
+    calculateAndSetCurrentRoundCardAmount();
+
+    playersAlivesId.forEach((playerId) => {
+      newRound.addPlayer(playerId, deck.splice(0, state.maxRoundCardAmount));
+    });
 
     // players: {
     //   someId: {
@@ -132,7 +139,33 @@ function createGame() {
     // lastPlayer: { playerId: "other id" },
   }
 
-  function calculateMaxCardAmount(numberOfPlayers) {
+  function Round() {
+    this.players = {};
+    this.joker = {};
+    this.deck = [];
+    this.trash = [];
+    this.firstPlayer = {};
+    this.lastPlayer;
+
+    Round.prototype.addPlayer = function (playerId, cards) {
+      var player = state.players[playerId];
+      this.players[playerId] = new PlayerPlayable(playerId, player.name, cards);
+    };
+  }
+
+  function PlayerObject(playerId, name, lives = 2, ready = false) {
+    this.name = name;
+    this.lives = lives;
+    this.ready = ready;
+  }
+
+  function PlayerPlayable(playerId, name, cards, move = false) {
+    this.name = name;
+    this.move = ready;
+    this.cards = cards;
+  }
+
+  function calculateAndSetMaxRoundCardAmount(numberOfPlayers) {
     const possibility = {
       2: 3,
       3: 3,
@@ -149,7 +182,13 @@ function createGame() {
       14: 2,
     };
 
-    return possibility[numberOfPlayers];
+    state.maxRoundCardAmount = possibility[numberOfPlayers];
+  }
+
+  function calculateAndSetCurrentRoundCardAmount() {
+    if (state.currentRoundCartAmount >= state.maxRoundCardAmount)
+      state.currentRoundCartAmount;
+    else state.currentRoundCartAmount += 1;
   }
 
   function isEverybodyReady() {

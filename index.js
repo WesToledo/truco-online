@@ -1,11 +1,13 @@
-import express from 'express'
-import http from 'http'
+import express from "express";
+import http from "http";
 
-const app = express()
-const server = http.createServer(app)
+import { createGame } from "./game";
 
-app.use(express.static('public'))
+const app = express();
+const server = http.createServer(app);
+
+app.use(express.static("public"));
 
 server.listen(3000, () => {
-    console.log(`> Server listening on port: 3000`)
-})
+  console.log(`> Server listening on port: 3000`);
+});
