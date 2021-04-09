@@ -1,4 +1,4 @@
-export function createGame() {
+function createGame() {
   const state = {
     init: false,
     players: {
@@ -30,7 +30,7 @@ export function createGame() {
         lastPlayer: { playerId: "other id" },
       },
     ],
-    currentPlayer: { playerId: playerId },
+    currentPlayer: { playerId: "playerId" },
     currentRoundCartAmount: 1,
     maxRoundCardAmount: 8,
     lastPlayerLastGame: {},
@@ -61,7 +61,7 @@ export function createGame() {
         number: number,
         naipe: naipe,
       };
-      deck.add(card);
+      deck.push(card);
     }
   }
 
@@ -227,7 +227,10 @@ export function createGame() {
   }
 
   return {
+    state,
     addPlayer,
     removePlayer,
   };
 }
+
+module.exports = createGame;
