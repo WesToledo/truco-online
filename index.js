@@ -41,7 +41,7 @@ const game = createGame();
 io.on("connection", (socket) => {
   const playerId = socket.id;
   console.log(`> Player connected: ${playerId}`);
-  console.log(game.state)
+  
   socket.emit("setup", game.state);
 });
 

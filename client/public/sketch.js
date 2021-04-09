@@ -56,36 +56,6 @@ function preload() {
   deckHeight = floor(cardHeight + cardHeight * 0.8 * 0.7);
   deckX = floor(centerX + centerX * 0.35);
   deckY = floor(centerY);
-
-  // let values = [
-  //   "A",
-  //   "2",
-  //   "3",
-  //   "4",
-  //   "5",
-  //   "6",
-  //   "7",
-  //   "8",
-  //   "9",
-  //   "10",
-  //   "J",
-  //   "Q",
-  //   "K",
-  // ];
-  // let naipes = ["S", "H", "D", "C"];
-
-  // for (const n of naipes) {
-  //   for (const v of values) {
-  //     card = new Card(
-  //       cardWidth,
-  //       cardHeight,
-  //       loadImage(`cards/${v}${n}.png`),
-  //       v,
-  //       n
-  //     );
-  //     deck.add(card);
-  //   }
-  // }
 }
 
 function setup() {
@@ -134,7 +104,7 @@ function draw() {
   // TRASH
   fill(1, 99, 15);
   if (cardIsOverTrash) {
-    strokeWeight(3)
+    strokeWeight(3);
     stroke(255);
     fill(15, 77, 24);
   }
@@ -216,7 +186,7 @@ function mouseReleased() {
 
 function isCardOverTrash() {
   if (cardIsOverTrash) {
-    card = deck[cardLockedIndex];
+    var card = deck[cardLockedIndex];
     card.setPosition(
       trashX - trashWidth / 2 + (trashWidth - cardWidth) / 2,
       trashY - trashHeight / 2 + (trashHeight - cardHeight) / 2
@@ -229,10 +199,10 @@ function isCardOverTrash() {
 
 function isCardOverBottomBondaries() {
   if (isCardBeingDragged) {
-    card = deck[cardLockedIndex];
+    var card = deck[cardLockedIndex];
 
-    x = card.v.x;
-    y = card.v.y;
+    var x = card.v.x;
+    var y = card.v.y;
 
     if (
       x >= 0 &&

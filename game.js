@@ -1,3 +1,30 @@
+function Round() {
+  this.players = {};
+  this.joker = {};
+  this.deck = [];
+  this.history = [];
+  this.trash = [];
+  this.firstPlayer = {};
+  this.lastPlayer;
+
+  Round.prototype.addPlayer = function (playerId, cards) {
+    var player = state.players[playerId];
+    this.players[playerId] = new PlayerPlayable(playerId, player.name, cards);
+  };
+}
+
+function PlayerObject(playerId, name, lives = 2, ready = false) {
+  this.name = name;
+  this.lives = lives;
+  this.ready = ready;
+}
+
+function PlayerPlayable(playerId, name, cards, move = false) {
+  this.name = name;
+  this.move = ready;
+  this.cards = cards;
+}
+
 function createGame() {
   const state = {
     init: false,
@@ -9,27 +36,7 @@ function createGame() {
       },
     },
     currentRound: 1,
-    rounds: [
-      {
-        players: {
-          someId: {
-            name: "Wesley",
-            cards: [],
-            move: false,
-          },
-        },
-        joker: {},
-        deck: [],
-        trash: [
-          {
-            card: "2C",
-            playerId: "some id",
-          },
-        ],
-        firstPlayer: { playerId: "some id" },
-        lastPlayer: { playerId: "other id" },
-      },
-    ],
+    rounds: [],
     currentPlayer: { playerId: "playerId" },
     currentRoundCartAmount: 1,
     maxRoundCardAmount: 8,
@@ -37,7 +44,7 @@ function createGame() {
   };
 
   // generate deck cards
-  const deck = [];
+  const globalDeck = [];
   let cardNumbers = [
     "A",
     "2",
@@ -61,12 +68,12 @@ function createGame() {
         number: number,
         naipe: naipe,
       };
-      deck.push(card);
+      globalDeck.push(card);
     }
   }
 
   // shuffle deck
-  var m = deck.length,
+  var m = globalDeck.length,
     t,
     i;
 
@@ -76,9 +83,9 @@ function createGame() {
     i = Math.floor(Math.random() * m--);
 
     // And swap it with the current element.
-    t = deck[m];
-    deck[m] = deck[i];
-    deck[i] = t;
+    t = globalDeck[m];
+    globalDeck[m] = globalDeck[i];
+    globalDeck[i] = t;
   }
 
   const observers = [];
@@ -99,7 +106,7 @@ function createGame() {
       // spread the cards to players
       Object.keys(state.players).forEach((playerId) => {
         state.players[playerId].cards[
-          deck.splice(0, state.currentRoundCartAmount)
+          globalDeck.splice(0, state.currentRoundCartAmount)
         ];
       });
     }
@@ -117,7 +124,10 @@ function createGame() {
     calculateAndSetCurrentRoundCardAmount();
 
     playersAlivesId.forEach((playerId) => {
-      newRound.addPlayer(playerId, deck.splice(0, state.maxRoundCardAmount));
+      newRound.addPlayer(
+        playerId,
+        globalDeck.splice(0, state.maxRoundCardAmount)
+      );
     });
 
     // players: {
@@ -137,32 +147,6 @@ function createGame() {
     // ],
     // firstPlayer: { playerId: "some id" },
     // lastPlayer: { playerId: "other id" },
-  }
-
-  function Round() {
-    this.players = {};
-    this.joker = {};
-    this.deck = [];
-    this.trash = [];
-    this.firstPlayer = {};
-    this.lastPlayer;
-
-    Round.prototype.addPlayer = function (playerId, cards) {
-      var player = state.players[playerId];
-      this.players[playerId] = new PlayerPlayable(playerId, player.name, cards);
-    };
-  }
-
-  function PlayerObject(playerId, name, lives = 2, ready = false) {
-    this.name = name;
-    this.lives = lives;
-    this.ready = ready;
-  }
-
-  function PlayerPlayable(playerId, name, cards, move = false) {
-    this.name = name;
-    this.move = ready;
-    this.cards = cards;
   }
 
   function calculateAndSetMaxRoundCardAmount(numberOfPlayers) {
