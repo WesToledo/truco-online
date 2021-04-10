@@ -1,4 +1,4 @@
-export default function renderScreen() {
+export default function renderScreen(game) {
   const sketch = (p) => {
     var windowWidth = window.innerWidth;
     var windowHeight = window.innerHeight;
@@ -110,14 +110,20 @@ export default function renderScreen() {
       trashX = p.floor(centerX);
       trashY = p.floor(centerY);
 
-      for (let i = 1; i <= 4; i++) {
+      const players = game.getPlayers();
+      const playersId = Object.keys(players);
+
+      var c = p.ceil((rightY + rightHeight) / playersAmount + 1);
+
+      for (const [index, playerId] of playersId.entries()) {
         var x = circleX;
-        var c = p.ceil((rightY + rightHeight) / 5);
-        var y = p.floor(circleDiameter / 2 + i * c);
+        var y = p.floor(circleDiameter / 2 + (index + 1) * c);
 
-        console.log({ x: x, y: y });
-
-        circleCoordinates.push({ x: x, y: y });
+        circleCoordinates.push({
+          x: x,
+          y: y,
+          imgUrl: players[playerId].imgUrl,
+        });
       }
     };
 

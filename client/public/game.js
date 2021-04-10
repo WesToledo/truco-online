@@ -8,8 +8,9 @@ function Round(players, joker, deck, trash, firtsPlayer, lastPlayer) {
   this.lastPlayer = lastPlayer;
 }
 
-function PlayerObject(name, lives = 2, ready = false) {
+function PlayerObject(name, imgUrl, lives = 2, ready = false) {
   this.name = name;
+  this.imgUrl = imgUrl;
   this.lives = lives;
   this.ready = ready;
 }
@@ -20,7 +21,7 @@ function PlayerPlayable(name, cards, move = false) {
   this.cards = cards;
 }
 
-function createGame() {
+export default function createGame() {
   const state = {
     init: false,
     players: {},
@@ -32,7 +33,6 @@ function createGame() {
     lastPlayerLastGame: {},
   };
 
-  // generate deck cards
   const globalDeck = [];
 
   const observers = [];
@@ -55,6 +55,10 @@ function createGame() {
     this.state.currentPlayer = playerId;
   }
 
+  function getPlayers() {
+    return this.state.players;
+  }
+
   function init() {}
 
   function initNewRound(round) {
@@ -66,12 +70,9 @@ function createGame() {
   function addPlayer(command) {
     const playerId = command.playerId;
     const name = command.name;
+    const imgUrl = command.imgUrl;
 
-    state.players[playerId] = {
-      name: name,
-      lives: 2,
-      ready: false,
-    };
+    state.players[playerId] = new PlayerObject(name, imgUrl);
 
     notifyAll({
       type: "add-player",
@@ -95,6 +96,7 @@ function createGame() {
   return {
     state,
     setState,
+    setCurrentPlayer,
     addPlayer,
     removePlayer,
   };
