@@ -5,9 +5,36 @@ export default function renderScreen() {
 
     var backCardImage;
 
+    //Global
+    var sectionWeight;
+
+    //CIRCLE
+    var circleX;
+    var circleY;
+    var circleCoordinates = [];
+    var circleDiameter;
+
+    //Top
+    var topHeight;
+    var topY;
+
     // Bottom
     var bottomHeight;
+    var bottomWidth;
+    var bottomX;
     var bottomY;
+
+    // Right
+    var rightWidth;
+    var rightHeight;
+    var rightX;
+    var rightY;
+
+    // Left
+    var leftWidth;
+    var leftHeight;
+    var leftX;
+    var leftY;
 
     var cardWidth;
     var cardHeight;
@@ -26,11 +53,9 @@ export default function renderScreen() {
     var trashX;
     var trashY;
 
-    //Position deck
-    var deckWidth;
-    var deckHeight;
-    var deckX;
-    var deckY;
+    // draggable
+    var xOffset;
+    var yOffset;
 
     var deck = [];
 
@@ -38,26 +63,62 @@ export default function renderScreen() {
     var cardIsOverTrash = false;
 
     p.preload = function () {
+      //GLOBAL
+      sectionWeight = p.floor(windowHeight * 0.1);
+
+      //TOP SECTION
+      topHeight = sectionWeight;
+      topY = 0;
+
+      //BOTTOM SECTION
+      bottomWidth = windowWidth;
       bottomHeight = p.floor(windowHeight * 0.2);
+      bottomX = 0;
       bottomY = p.floor(windowHeight * 0.8);
 
-      cardWidth = p.floor(bottomHeight * 0.6);
-      cardHeight = p.floor(bottomHeight * 0.8);
+      //RIGHT SECTION
+      rightWidth = sectionWeight;
+      rightHeight = windowHeight - bottomHeight - topHeight;
+      rightX = p.floor(windowWidth - rightWidth);
+      rightY = p.floor(topHeight);
 
+      //LEFT SECTION
+      leftWidth = sectionWeight;
+      leftHeight = windowHeight - bottomHeight - topHeight;
+      leftX = 0;
+      leftY = topHeight;
+
+      //CIRCLE
+      circleX = p.floor(rightX + (windowWidth - rightX) / 2);
+      circleY = rightHeight - 100;
+
+      circleDiameter = p.floor(sectionWeight - sectionWeight * 0.2);
+
+      //CARD SECTION
+      cardWidth = p.floor(bottomHeight * 0.6);
+      cardHeight = p.floor(bottomHeight * 0.85);
+
+      //CENTER SECTION
       centerX = p.floor(windowWidth * 0.5);
       centerY = p.floor(windowHeight * 0.4);
       centerWidth = p.floor(windowWidth * 0.7);
       centerHeight = p.floor(windowHeight * 0.25);
 
-      trashWidth = p.floor(cardWidth + cardWidth * 0.8);
-      trashHeight = p.floor(cardHeight + cardHeight * 0.8 * 0.7);
-      trashX = p.floor(centerX - centerX * 0.35);
+      // TRASH SECTION
+      trashWidth = p.floor(cardWidth + cardWidth * 0.5);
+      trashHeight = p.floor(cardHeight + cardHeight * 0.5);
+      trashX = p.floor(centerX);
       trashY = p.floor(centerY);
 
-      deckWidth = p.floor(cardWidth + cardWidth * 0.8);
-      deckHeight = p.floor(cardHeight + cardHeight * 0.8 * 0.7);
-      deckX = p.floor(centerX + centerX * 0.35);
-      deckY = p.floor(centerY);
+      for (let i = 1; i <= 4; i++) {
+        var x = circleX;
+        var c = p.ceil((rightY + rightHeight) / 5);
+        var y = p.floor(circleDiameter / 2 + i * c);
+
+        console.log({ x: x, y: y });
+
+        circleCoordinates.push({ x: x, y: y });
+      }
     };
 
     p.setup = function () {
@@ -95,11 +156,38 @@ export default function renderScreen() {
     p.draw = function () {
       p.background(p.color("green"));
 
-      // BOTTOM
+      // TOP
       p.fill(1, 99, 15);
       p.noStroke();
       p.rectMode(p.CORNER);
-      p.rect(0, bottomY, windowWidth, bottomHeight);
+      p.rect(0, topY, windowWidth, topHeight);
+
+      // BOTTOM
+      p.fill(29, 87, 38);
+      p.noStroke();
+      p.rectMode(p.CORNER);
+      p.rect(bottomX, bottomY, bottomWidth, bottomHeight);
+
+      // RIGHT
+      p.fill(1, 99, 15);
+      p.noStroke();
+      p.rectMode(p.CORNER);
+      p.rect(rightX, rightY, rightWidth, rightHeight);
+
+      p.stroke("white");
+      p.strokeWeight(10);
+      p.point(rightX + rightWidth / 2, rightY + rightHeight / 2);
+
+      // LEFT
+      p.fill(1, 99, 15);
+      p.noStroke();
+      p.rectMode(p.CORNER);
+      p.rect(leftX, leftY, leftWidth, leftHeight);
+
+      // //CIRCLE
+      // p.fill(255);
+      // p.noStroke();
+      // p.circle(circleX, circleY, circleDiameter);
 
       // Draw center background
       // rectMode(CENTER);
@@ -119,26 +207,20 @@ export default function renderScreen() {
         card.display();
       }
 
-      // DECK
-      p.rectMode(p.CENTER);
-      p.noStroke();
-      p.fill(1, 99, 15);
-      p.rect(deckX, deckY, deckWidth, deckHeight);
-      p.image(
-        backCardImage,
-        deckX - deckWidth / 2 + (deckWidth - cardWidth) / 2,
-        deckY - deckHeight / 2 + (deckHeight - cardHeight) / 2,
-        cardWidth,
-        cardHeight
-      );
-
       // CARDS
       for (const card of deck) {
         card.display();
       }
+
+      // console.table(circleCoordinates);
+
+      p.fill(255);
+      p.noStroke();
+      for (const { x, y } of circleCoordinates) {
+        p.circle(x, y, circleDiameter);
+      }
     };
-    var xOffset;
-    var yOffset;
+
     p.mousePressed = function () {
       for (const [index, card] of deck.entries()) {
         if (card.contains(p.mouseX, p.mouseY)) {
