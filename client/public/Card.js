@@ -69,3 +69,4 @@ function Card(p, x, y, w, h, img, value, naipe) {
     this.previousPosition.y = this.v.y;
   };
 }
+export default Card;
