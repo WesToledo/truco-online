@@ -96,6 +96,8 @@ export default function createGame() {
   return {
     state,
     setState,
+    getPlayers,
+    initNewRound,
     setCurrentPlayer,
     addPlayer,
     removePlayer,

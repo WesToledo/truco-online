@@ -3,10 +3,8 @@ export default function renderScreen(game) {
     var windowWidth = window.innerWidth;
     var windowHeight = window.innerHeight;
 
-    var backCardImage;
-
     //Global
-    var sectionWeight;
+    var lateralSectionsWeight;
 
     //CIRCLE
     var circleX;
@@ -64,10 +62,10 @@ export default function renderScreen(game) {
 
     p.preload = function () {
       //GLOBAL
-      sectionWeight = p.floor(windowHeight * 0.1);
+      lateralSectionsWeight = p.floor(windowHeight * 0.1);
 
       //TOP SECTION
-      topHeight = sectionWeight;
+      topHeight = lateralSectionsWeight;
       topY = 0;
 
       //BOTTOM SECTION
@@ -77,13 +75,13 @@ export default function renderScreen(game) {
       bottomY = p.floor(windowHeight * 0.8);
 
       //RIGHT SECTION
-      rightWidth = sectionWeight;
+      rightWidth = lateralSectionsWeight;
       rightHeight = windowHeight - bottomHeight - topHeight;
-      rightX = p.floor(windowWidth - rightWidth);
+      rightX = windowWidth - rightWidth;
       rightY = p.floor(topHeight);
 
       //LEFT SECTION
-      leftWidth = sectionWeight;
+      leftWidth = lateralSectionsWeight;
       leftHeight = windowHeight - bottomHeight - topHeight;
       leftX = 0;
       leftY = topHeight;
@@ -92,7 +90,9 @@ export default function renderScreen(game) {
       circleX = p.floor(rightX + (windowWidth - rightX) / 2);
       circleY = rightHeight - 100;
 
-      circleDiameter = p.floor(sectionWeight - sectionWeight * 0.2);
+      circleDiameter = p.floor(
+        lateralSectionsWeight - lateralSectionsWeight * 0.2
+      );
 
       //CARD SECTION
       cardWidth = p.floor(bottomHeight * 0.6);
@@ -105,50 +105,117 @@ export default function renderScreen(game) {
       centerHeight = p.floor(windowHeight * 0.25);
 
       // TRASH SECTION
-      trashWidth = p.floor(cardWidth + cardWidth * 0.5);
-      trashHeight = p.floor(cardHeight + cardHeight * 0.5);
-      trashX = p.floor(centerX);
-      trashY = p.floor(centerY);
+      trashWidth = p.ceil(cardWidth + cardWidth * 0.5);
+      trashHeight = p.ceil(cardHeight + cardHeight * 0.5);
+      trashX = p.ceil(centerX);
+      trashY = p.ceil(centerY);
 
       const players = game.getPlayers();
       const playersId = Object.keys(players);
 
-      var c = p.ceil((rightY + rightHeight) / playersAmount + 1);
+      const amountPlayers = playersId.length;
 
-      for (const [index, playerId] of playersId.entries()) {
-        var x = circleX;
-        var y = p.floor(circleDiameter / 2 + (index + 1) * c);
+      var rightPlayersId;
+      var centerPlayersId;
+      var leftPlayersId;
+
+      switch (true) {
+        case amountPlayers > 3:
+          const aux = amountPlayers % 3;
+          rightPlayersId = playersId.splice(0, aux);
+          centerPlayersId = playersId.splice(0, playersId.length - aux);
+          leftPlayersId = playersId.splice(0, playersId.length);
+          break;
+        case amountPlayers === 3:
+          rightPlayersId = playersId.splice(0, 1);
+          centerPlayersId = playersId.splice(0, 1);
+          leftPlayersId = playersId.splice(0, 1);
+          break;
+        case amountPlayers === 2:
+          rightPlayersId = playersId.splice(0, 1);
+          centerPlayersId = [];
+          leftPlayersId = playersId.splice(0, 1);
+          break;
+        case amountPlayers === 1:
+          rightPlayersId = [];
+          centerPlayersId = [];
+          leftPlayersId = [];
+          break;
+      }
+
+      console.log(rightPlayersId);
+      console.log(centerPlayersId);
+      console.log(leftPlayersId);
+
+      var lateralSpacing = p.ceil(rightHeight / (rightPlayersId.length + 1));
+
+      // CIRCLES RIGHT
+      for (const [index, playerId] of rightPlayersId.entries()) {
+        var x = rightX + rightWidth / 2;
+        var y = p.floor(
+          circleDiameter + (index + 1) * lateralSpacing + circleDiameter / 4
+        );
 
         circleCoordinates.push({
           x: x,
           y: y,
-          imgUrl: players[playerId].imgUrl,
+          img: p.loadImage(players[playerId].imgUrl),
+        });
+      }
+
+      // CIRCLES LEFT
+      for (const [index, playerId] of leftPlayersId.entries()) {
+        var x = leftWidth / 2;
+        var y = p.floor(
+          circleDiameter + (index + 1) * lateralSpacing + circleDiameter / 4
+        );
+
+        circleCoordinates.push({
+          x: x,
+          y: y,
+          img: p.loadImage(players[playerId].imgUrl),
+        });
+      }
+
+      // CIRCLES CENTER
+      var spacing = windowWidth / (centerPlayersId.length + 1);
+      for (const [index, playerId] of centerPlayersId.entries()) {
+        var y = topHeight / 2;
+        var x = p.floor((index + 1) * spacing);
+
+        circleCoordinates.push({
+          x: x,
+          y: y,
+          img: p.loadImage(players[playerId].imgUrl),
         });
       }
     };
 
     p.setup = function () {
       p.createCanvas(windowWidth, windowHeight);
-      backCardImage = p.loadImage(`cards/gray_back.png`);
 
-      initializeDeck(["2C", "3H"]);
+      initializeDeck(["2C", "3H", "3H", "3H", "3H"]);
     };
 
     function initializeDeck(cardCodes) {
-      var border = 0.05 * windowWidth;
-      var spacing = p.floor(
-        (windowWidth - 2 * border) / cardCodes.length -
-          border / cardCodes.length
-      );
+      var lateralBorder = 0.05 * windowWidth;
+
+      // var spacing = p.floor(
+      //   (windowWidth - 2 * lateralBorder) / cardCodes.length -
+      //     lateralBorder / cardCodes.length
+      // );
+
+      var spacing = (windowWidth - 2 * lateralBorder) / (cardCodes.length + 1);
 
       for (const [index, cardCode] of cardCodes.entries()) {
-        var x = border + index * spacing;
+        var x = p.floor((index + 1) * spacing + cardWidth / 4);
+        var y = bottomY + bottomHeight / 2;
 
         deck.push(
           new Card(
             p,
             x,
-            bottomY + (bottomHeight - cardHeight) / 2,
+            y,
             cardWidth,
             cardHeight,
             p.loadImage(`cards/${cardCode}.png`),
@@ -209,21 +276,26 @@ export default function renderScreen(game) {
       p.rectMode(p.CENTER);
       p.rect(trashX, trashY, trashWidth, trashHeight);
 
+      // console.table(circleCoordinates);
+
+      p.fill(255);
+      p.noStroke();
+      for (const { x, y, img } of circleCoordinates) {
+        //p.circle(x, y, circleDiameter);
+
+        p.image(img, x, y, circleDiameter, circleDiameter);
+        p.imageMode(p.CENTER);
+      }
+
       for (const card of trash) {
+        p.rectMode(p.CORNER);
         card.display();
       }
 
       // CARDS
       for (const card of deck) {
+        p.rectMode(p.CENTER);
         card.display();
-      }
-
-      // console.table(circleCoordinates);
-
-      p.fill(255);
-      p.noStroke();
-      for (const { x, y } of circleCoordinates) {
-        p.circle(x, y, circleDiameter);
       }
     };
 
@@ -282,10 +354,7 @@ export default function renderScreen(game) {
     function isCardOverTrash() {
       if (cardIsOverTrash) {
         var card = deck[cardLockedIndex];
-        card.setPosition(
-          trashX - trashWidth / 2 + (trashWidth - cardWidth) / 2,
-          trashY - trashHeight / 2 + (trashHeight - cardHeight) / 2
-        );
+        card.setPosition(trashX, trashY);
 
         trash.push(card);
         deck.splice(cardLockedIndex, 1);
@@ -302,7 +371,7 @@ export default function renderScreen(game) {
         if (
           x >= 0 &&
           x <= windowWidth &&
-          y <= bottomY &&
+          y - card.height / 2 <= bottomY &&
           y <= bottomY + bottomHeight
         ) {
           deck[cardLockedIndex].setPosition(

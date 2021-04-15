@@ -26,19 +26,43 @@
 
       const game = createGame();
 
-      game.addPlayer({ name: "wes", imgUrl: "./img/person.jpeg" });
-      game.addPlayer({ name: "wes", imgUrl: "./img/person.jpeg" });
-      game.addPlayer({ name: "wes", imgUrl: "./img/person.jpeg" });
-      game.addPlayer({ name: "wes", imgUrl: "./img/person.jpeg" });
+      game.addPlayer({
+        playerId: "1",
+        name: "wes",
+        imgUrl: "img/person.jpeg",
+      });
+      game.addPlayer({
+        playerId: "2",
+        name: "wes",
+        imgUrl: "img/person.jpeg",
+      });
+      game.addPlayer({
+        playerId: "3",
+        name: "wes",
+        imgUrl: "img/person.jpeg",
+      });
+      game.addPlayer({
+        playerId: "4",
+        name: "wes",
+        imgUrl: "img/person.jpeg",
+      });
+
+      game.addPlayer({
+        playerId: "5",
+        name: "wes",
+        imgUrl: "img/person.jpeg",
+      });
 
       socket.on("connection", (io) => {
         console.log("a user connected");
-        renderScreen(game);
+        //game.setState(io.state)
+
+        console.log(game.state);
       });
 
       socket.on("setup", (state) => {
         const playerId = io.id;
-        console.log(state);
+        renderScreen(game);
       });
     </script>
   </body>

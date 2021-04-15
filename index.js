@@ -39,10 +39,10 @@ const createGame = require("./game.js");
 const game = createGame();
 
 io.on("connection", (socket) => {
-  const playerId = socket.id;
-  console.log(`> Player connected: ${playerId}`);
-  
-  socket.emit("setup", game.state);
+  const id = socket.id;
+  console.log(`> Player connected: ${id}`);
+
+  socket.emit("setup", { state: game.state });
 });
 
 server.listen(3333, () => {

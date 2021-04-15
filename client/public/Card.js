@@ -44,10 +44,10 @@ function Card(p, x, y, w, h, img, value, naipe) {
 
   Card.prototype.contains = function (x, y) {
     return (
-      x >= this.v.x &&
-      x <= this.v.x + this.width &&
-      y >= this.v.y &&
-      y <= this.v.y + this.height
+      x >= this.v.x - this.width / 2 &&
+      x <= this.v.x + this.width / 2 &&
+      y >= this.v.y - this.height / 2 &&
+      y <= this.v.y + this.height / 2
     );
   };
 
