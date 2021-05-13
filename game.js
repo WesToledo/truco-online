@@ -8,85 +8,80 @@ function Round() {
   this.lastPlayer;
 
   Round.prototype.addPlayer = function (playerId, cards) {
-    var player = state.players[playerId];
+    var player = game.players[playerId];
     this.players[playerId] = new PlayerPlayable(playerId, player.name, cards);
   };
 }
 
-function PlayerObject(playerId, name, lives = 2, ready = false) {
-  this.name = name;
-  this.lives = lives;
-  this.ready = ready;
+function createPlayerObject(playerId, name, imageURL, admin) {
+  return { playerId, name, imageURL, admin };
 }
 
-function PlayerPlayable(playerId, name, cards, move = false) {
+function PlayerPlayable(playerId, name, cards, moved = false) {
+  this.playerId = playerId;
   this.name = name;
-  this.move = ready;
   this.cards = cards;
+  this.moved = moved;
 }
 
-function createGame() {
-  const state = {
+function createGameInstance() {
+  const server = {
+    deck: [],
+    waitList: [], // list of players waiting to join the game
+    isGameRunning: false, // if all of players join the waiting list, then open the game
+  };
+
+  function isGameRunning() {
+    return server.isGameRunning;
+  }
+
+  function addPlayerToWaitList(command) {
+    const playerId = command.playerId;
+    const name = command.name;
+    const imageURL = command.imageURL;
+    const admin = command.admin;
+
+    server.waitList.push(createPlayerObject(playerId, name, imageURL, admin));
+
+    notifyAll({
+      type: "add-player-to-wait-list",
+      playerId,
+      name,
+      imageURL,
+      admin,
+    });
+  }
+
+  function removePlayerInWaitList(command) {
+    const playerId = command.playerId;
+
+    this.server.waitList = this.server.waitList.filter(
+      (player) => player.playerId != playerId
+    );
+
+    notifyAll({
+      type: "remove-player-in-wait-list",
+      playerId: playerId,
+    });
+  }
+
+  const gameDefaultState = {
     init: false,
-    players: {
-      someId: {
-        name: "Wesley",
-        lives: 2,
-        ready: false,
-      },
-    },
+    players: {},
     currentRound: 1,
     rounds: [],
-    currentPlayer: { playerId: "playerId" },
+    currentPlayer: {
+      // playerId: "playerId"
+    },
     currentRoundCartAmount: 1,
     maxRoundCardAmount: 8,
     lastPlayerLastGame: {},
   };
 
-  // generate deck cards
-  const globalDeck = [];
-  let cardNumbers = [
-    "A",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "10",
-    "J",
-    "Q",
-    "K",
-  ];
-  let cardNaipes = ["S", "H", "D", "C"];
+  const game = gameDefaultState;
 
-  for (const naipe of cardNaipes) {
-    for (const number of cardNumbers) {
-      card = {
-        number: number,
-        naipe: naipe,
-      };
-      globalDeck.push(card);
-    }
-  }
-
-  // shuffle deck
-  var m = globalDeck.length,
-    t,
-    i;
-
-  // While there remain elements to shuffle…
-  while (m) {
-    // Pick a remaining element…
-    i = Math.floor(Math.random() * m--);
-
-    // And swap it with the current element.
-    t = globalDeck[m];
-    globalDeck[m] = globalDeck[i];
-    globalDeck[i] = t;
-  }
+  //DEFAULT FUNCTIONS
+  initDefaultDeck();
 
   const observers = [];
 
@@ -100,24 +95,84 @@ function createGame() {
     }
   }
 
-  function init() {
+  function initDefaultDeck() {
+    let cardNumbers = [
+      "A",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "J",
+      "Q",
+      "K",
+    ];
+    let cardNaipes = ["S", "H", "D", "C"];
+
+    for (const naipe of cardNaipes) {
+      for (const number of cardNumbers) {
+        card = {
+          number: number,
+          naipe: naipe,
+        };
+        server.deck.push(card);
+      }
+    }
+  }
+
+  function getShuffledDeck() {
+    var deckCopy = [...server.deck];
+
+    // shuffle deck
+    var m = deckCopy.length,
+      t,
+      i;
+
+    // While there remain elements to shuffle…
+    while (m) {
+      // Pick a remaining element…
+      i = Math.floor(Math.random() * m--);
+
+      // And swap it with the current element.
+      t = deckCopy[m];
+      deckCopy[m] = deckCopy[i];
+      deckCopy[i] = t;
+    }
+    return deckCopy;
+  }
+
+  function preload() {
     //if someone its not ready, its not init the game
     if (isEverybodyReady()) {
       // spread the cards to players
-      Object.keys(state.players).forEach((playerId) => {
-        state.players[playerId].cards[
-          globalDeck.splice(0, state.currentRoundCartAmount)
+      var deckShuffled = getShuffledDeck();
+
+      Object.keys(game.players).forEach((playerId) => {
+        game.players[playerId].cards[
+          deckShuffled.splice(0, game.currentRoundCartAmount)
         ];
       });
     }
   }
 
   function createNewRound() {
+    function setAllPlayersNotReady() {
+      Object.keys(game.players).forEach((playerId) => {
+        game.players[playerId].ready = false;
+      });
+    }
+
+    setAllPlayersNotReady();
+
     let newRound = new Round();
 
     // select only the players that are playing (lives > 0)
-    const playersAlivesId = Object.keys(state.players).filter(
-      (playerId) => state.players[playerId].lives > 0
+    const playersAlivesId = Object.keys(game.players).filter(
+      (playerId) => game.players[playerId].lives > 0
     );
 
     calculateAndSetMaxRoundCardAmount(playersAlivesId.length);
@@ -126,7 +181,7 @@ function createGame() {
     playersAlivesId.forEach((playerId) => {
       newRound.addPlayer(
         playerId,
-        globalDeck.splice(0, state.maxRoundCardAmount)
+        globalDeck.splice(0, game.maxRoundCardAmount)
       );
     });
 
@@ -166,26 +221,31 @@ function createGame() {
       14: 2,
     };
 
-    state.maxRoundCardAmount = possibility[numberOfPlayers];
+    game.maxRoundCardAmount = possibility[numberOfPlayers];
   }
 
   function calculateAndSetCurrentRoundCardAmount() {
-    if (state.currentRoundCartAmount >= state.maxRoundCardAmount)
-      state.currentRoundCartAmount;
-    else state.currentRoundCartAmount += 1;
+    if (game.currentRoundCartAmount >= game.maxRoundCardAmount)
+      game.currentRoundCartAmount;
+    else game.currentRoundCartAmount += 1;
   }
 
   function isEverybodyReady() {
-    return !Object.keys(state.players).some(
-      (playerId) => state.players[playerId].ready === false
+    return !Object.keys(game.players).some(
+      (playerId) => game.players[playerId].ready === false
     );
+  }
+
+  function setPlayerReady(command) {
+    const playerId = command.playerId;
+    game.players[playerId].ready = true;
   }
 
   function addPlayer(command) {
     const playerId = command.playerId;
     const name = command.name;
 
-    state.players[playerId] = {
+    game.players[playerId] = {
       name: name,
       lives: 2,
       ready: false,
@@ -202,7 +262,7 @@ function createGame() {
   function removePlayer(command) {
     const playerId = command.playerId;
 
-    delete state.players[playerId];
+    delete game.players[playerId];
 
     notifyAll({
       type: "remove-player",
@@ -210,11 +270,24 @@ function createGame() {
     });
   }
 
+  function resetGameState() {
+    Object.assign(game, gameDefaultState);
+  }
+
   return {
-    state,
+    //server
+    server,
+    isGameRunning,
+    addPlayerToWaitList,
+    removePlayerInWaitList,
+    subscribe,
+
+    //game
+    game,
     addPlayer,
     removePlayer,
+    resetGameState,
   };
 }
 
-module.exports = createGame;
+module.exports = createGameInstance;

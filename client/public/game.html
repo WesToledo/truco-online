@@ -18,50 +18,54 @@
     <!-- <script src="sketch.js"></script> -->
     <script type="module">
       import renderScreen from "./renderScreen.js";
-      import createGame from "./game.js";
+      import renderWaitScreen from "./renderWaitScreen.js";
+      import createGameInstance from "./game-client.js";
 
-      const socket = io("http://localhost:3333");
+      const socket = io(
+        "http://localhost:3333" +
+          "?name=Wesley&admin=true&imageURL=https://homepages.cae.wisc.edu/~ece533/images/airplane.png"
+      );
 
-      const game = createGame();
+      const gameInstance = createGameInstance();
 
-      game.addPlayer({
-        playerId: "1",
-        name: "wes",
-        imgUrl: "img/person.jpeg",
-      });
-      game.addPlayer({
-        playerId: "2",
-        name: "wes",
-        imgUrl: "img/person.jpeg",
-      });
-      game.addPlayer({
-        playerId: "3",
-        name: "wes",
-        imgUrl: "img/person.jpeg",
-      });
-      game.addPlayer({
-        playerId: "4",
-        name: "wes",
-        imgUrl: "img/person.jpeg",
-      });
+      const playerId = io.id;
 
-      game.addPlayer({
-        playerId: "5",
-        name: "wes",
-        imgUrl: "img/person.jpeg",
-      });
+      function renderWaitList() {
+        renderWaitScreen(gameInstance.getWaitList());
+      }
 
-      socket.on("connection", (io) => {
-        console.log("a user connected");
-        //game.setState(io.state)
-
-        console.log(game.state);
+      socket.on("connect", (io) => {
+        gameInstance.setCurrentPlayerId(playerId);
+        gameInstance.setScreenToRender("wait");
+        //renderScreen(gameInstance);
       });
 
       socket.on("setup", (state) => {
-        const playerId = io.id;
-        renderScreen(game);
+        if (state.hasOwnProperty("error")) {
+          alert(state.error);
+          socket.disconnect();
+        } else {
+          const { screen, waitList } = state;
+          gameInstance.setScreenToRender(screen);
+          gameInstance.setWaitList(waitList);
+
+          renderWaitList();
+        }
+      });
+
+      socket.on("add-player-to-wait-list", (command) => {
+        console.log("command", command);
+        gameInstance.addPlayerToWaitList(command);
+        renderWaitList();
+      });
+
+      socket.on("remove-player-in-wait-list", (command) => {
+        console.log("command", command);
+        gameInstance.removePlayerInWaitList(command);
+        renderWaitList();
       });
     </script>
+
+    <div id="players"></div>
   </body>
 </html>

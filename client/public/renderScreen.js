@@ -1,36 +1,46 @@
 import renderGameScreen from "./renderGameScreen.js";
 
 export default function renderScreen(game) {
-  let canvas;
   const sketch = (p) => {
+    const currentPlayerId = game.getCurrentPlayerId();
+
     const gameScreen = new renderGameScreen(p, game);
 
     var windowWidth = window.innerWidth;
     var windowHeight = window.innerHeight;
 
     p.preload = function () {
-      gameScreen.preload();
+      if (game.local.screen === "game") gameScreen.preload();
     };
 
     p.setup = function () {
-      canvas = p.createCanvas(windowWidth, windowHeight);
-      gameScreen.setup();
+      if (game.local.screen === "game") {
+        p.createCanvas(windowWidth, windowHeight);
+        gameScreen.setup();
+      }
     };
 
     p.draw = function () {
-      gameScreen.draw();
+      // if (!game.state.players[currentPlayerId].ready) {
+      //   // render screen to say he's ready
+      // }
+      // if (!game.isEverybodyReady()) {
+      //   // render wait page
+      // } else {
+      // }
+      if (game.local.screen === "game") gameScreen.draw();
     };
 
     p.mousePressed = function () {
-      gameScreen.mousePressed();
+      if (game.local.screen === "game") gameScreen.mousePressed();
     };
 
     p.mouseDragged = function () {
-      gameScreen.mouseDragged();
+      if (game.local.screen === "game") gameScreen.mouseDragged();
     };
 
     p.mouseReleased = function () {
-      gameScreen.mouseReleased();
+      if (game.local.screen === "game") gameScreen.mouseReleased();
     };
 
     window.onresize = function () {

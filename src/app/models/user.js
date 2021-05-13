@@ -16,6 +16,11 @@ const UserSchema = new mongoose.Schema({
     required: true,
     select: false,
   },
+  admin: {
+    type: String,
+    required: true,
+    default: false,
+  },
 });
 
 UserSchema.pre("save", async function (next) {

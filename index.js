@@ -5,6 +5,8 @@ const path = require("path");
 const http = require("http");
 const socketio = require("socket.io");
 
+const createGameInstance = require("./game.js");
+
 const app = express();
 
 const { rootRouter, userRouter } = require("./routes");
@@ -28,21 +30,41 @@ if (process.env.NODE_ENV === "production") {
 // app.listen(process.env.PORT || 3333);
 
 const server = http.createServer(app);
-const io = socketio(server, {
+const sockets = socketio(server, {
   cors: {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
 });
-const createGame = require("./game.js");
 
-const game = createGame();
+const gameInstance = createGameInstance();
 
-io.on("connection", (socket) => {
-  const id = socket.id;
-  console.log(`> Player connected: ${id}`);
+gameInstance.subscribe((command) => {
+  console.log(`> Emitting ${command.type}`);
+  sockets.emit(command.type, command);
+});
 
-  socket.emit("setup", { state: game.state });
+sockets.on("connection", (socket) => {
+  const playerId = socket.id;
+
+  //get user info from local storage
+  const { name, admin, imageURL } = socket.handshake.query; // include in future query directly to Mongo
+
+  if (gameInstance.isGameRunning()) {
+    // the game is alredy in 'curso'
+    socket.emit("setup", { error: "The game has already begun" });
+  } else {
+    gameInstance.addPlayerToWaitList({ playerId, name, imageURL, admin });
+
+    socket.emit("setup", {
+      screen: "wait",
+      waitList: gameInstance.server.waitList,
+    });
+  }
+
+  socket.on("disconnect", () => {
+    gameInstance.removePlayerInWaitList({ playerId });
+  });
 });
 
 server.listen(3333, () => {

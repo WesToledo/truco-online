@@ -84,9 +84,9 @@ export default function renderGameScreen(p, game) {
         leftPlayersId = playersId.splice(0, 1);
         break;
       case amountPlayers === 2:
-        rightPlayersId = playersId.splice(0, 1);
-        centerPlayersId = [];
-        leftPlayersId = playersId.splice(0, 1);
+        rightPlayersId = [];
+        centerPlayersId = playersId.splice(0, 1);
+        leftPlayersId = [];
         break;
       case amountPlayers === 1:
         rightPlayersId = [];
