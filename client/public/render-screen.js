@@ -1,4 +1,4 @@
-import renderGameScreen from "./renderGameScreen.js";
+import renderGameScreen from "./render-game-screen.js";
 
 export default function renderScreen(game) {
   const sketch = (p) => {

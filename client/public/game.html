@@ -1,5 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
+  <link
+    href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+    rel="stylesheet"
+    id="bootstrap-css"
+  />
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,13 +19,23 @@
     <script src="libraries/p5.sound.min.js"></script>
 
     <script src="https://cdn.socket.io/4.0.1/socket.io.js"></script>
+
+    <script src="https://raw.githack.com/creativetimofficial/argon-dashboard/master/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.3.1/css/all.min.css"
+      rel="stylesheet"
+    />
   </head>
 
   <body>
     <!-- <script src="sketch.js"></script> -->
     <script type="module">
-      import renderScreen from "./renderScreen.js";
-      import renderWaitScreen from "./renderWaitScreen.js";
+      import renderScreen from "./render-screen.js";
+      import renderWaitScreen from "./render-wait-screen.js";
       import createGameInstance from "./game-client.js";
 
       const socket = io(
@@ -31,11 +48,25 @@
       const playerId = io.id;
 
       function renderWaitList() {
+        function renderAdminButton() {
+          const buttonDiv = document.querySelector("#buttonDiv");
+          buttonDiv.innerHTML = `<button type="button" class="btn btn-primary">Começar partida</button>`;
+        }
         renderWaitScreen(gameInstance.getWaitList());
+        console.log(gameInstance.getCurrentPlayer());
+        if (gameInstance.getCurrentPlayer().admin) {
+          renderAdminButton();
+        }
       }
 
       socket.on("connect", (io) => {
-        gameInstance.setCurrentPlayerId(playerId);
+        gameInstance.setCurrentPlayer({
+          playerId,
+          name: "Wesley",
+          admin: true,
+          imageURL:
+            "https://homepages.cae.wisc.edu/~ece533/images/airplane.png",
+        });
         gameInstance.setScreenToRender("wait");
         //renderScreen(gameInstance);
       });
@@ -66,6 +97,138 @@
       });
     </script>
 
-    <div id="players"></div>
+    <div class="main-content">
+      <div class="container mt-7">
+        <!-- Table -->
+        <h2 class="mb-5">Lista de Espera</h2>
+        <div class="row">
+          <div class="col">
+            <div class="card shadow">
+              <div class="card-header border-0">
+                <h3 class="mb-0">Jogadores</h3>
+              </div>
+              <div class="table-responsive">
+                <table
+                  class="table align-items-center table-flush"
+                  id="players"
+                >
+                  <!-- <thead class="thead-light">
+                      <tr>
+                        <th scope="col">Nome</th>
+                        <th scope="col">ID</th>
+                        <th scope="col">Admin</th>
+                        <th scope="col"></th>
+                        <th scope="col">Users</th>
+                        <th scope="col">Completion</th>
+                        <th scope="col"></th> -->
+                  <!-- </tr>
+                    </thead> -->
+                  <!-- <tbody > -->
+                  <!-- <tr>
+                        <th scope="row">
+                          <div class="media align-items-center">
+                            <a href="#" class="avatar rounded-circle mr-3">
+                              <img
+                                alt="Image placeholder"
+                                src="https://raw.githack.com/creativetimofficial/argon-dashboard/master/assets/img/theme/bootstrap.jpg"
+                              />
+                            </a>
+                            <div class="media-body">
+                              <span class="mb-0 text-sm"
+                                >Argon Design System</span
+                              >
+                            </div>
+                          </div>
+                        </th>
+                        <td>$2,500 USD</td>
+                        <td>
+                          <span class="badge badge-dot mr-4">
+                            <i class="bg-warning"></i> pending
+                          </span>
+                        </td> -->
+                  <!-- <td>
+                          <div class="avatar-group">
+                            <a
+                              href="#"
+                              class="avatar avatar-sm"
+                              data-toggle="tooltip"
+                              data-original-title="Ryan Tompson"
+                            >
+                              <img
+                                alt="Image placeholder"
+                                src="https://raw.githack.com/creativetimofficial/argon-dashboard/master/assets/img/theme/team-1-800x800.jpg"
+                                class="rounded-circle"
+                              />
+                            </a>
+                            <a
+                              href="#"
+                              class="avatar avatar-sm"
+                              data-toggle="tooltip"
+                              data-original-title="Romina Hadid"
+                            >
+                              <img
+                                alt="Image placeholder"
+                                src="https://raw.githack.com/creativetimofficial/argon-dashboard/master/assets/img/theme/team-2-800x800.jpg"
+                                class="rounded-circle"
+                              />
+                            </a>
+                            <a
+                              href="#"
+                              class="avatar avatar-sm"
+                              data-toggle="tooltip"
+                              data-original-title="Alexander Smith"
+                            >
+                              <img
+                                alt="Image placeholder"
+                                src="https://raw.githack.com/creativetimofficial/argon-dashboard/master/assets/img/theme/team-2-800x800.jpg"
+                                class="rounded-circle"
+                              />
+                            </a>
+                            <a
+                              href="#"
+                              class="avatar avatar-sm"
+                              data-toggle="tooltip"
+                              data-original-title="Jessica Doe"
+                            >
+                              <img
+                                alt="Image placeholder"
+                                src="https://raw.githack.com/creativetimofficial/argon-dashboard/master/assets/img/theme/team-4-800x800.jpg"
+                                class="rounded-circle"
+                              />
+                            </a>
+                          </div>
+                        </td> -->
+                  <!-- <td>
+                          <div class="d-flex align-items-center">
+                            <span class="mr-2">60%</span>
+                            <div>
+                              <div class="progress">
+                                <div
+                                  class="progress-bar bg-warning"
+                                  role="progressbar"
+                                  aria-valuenow="60"
+                                  aria-valuemin="0"
+                                  aria-valuemax="100"
+                                  style="width: 60%"
+                                ></div>
+                              </div>
+                            </div>
+                          </div>
+                        </td> -->
+                  <!-- </tr>
+                    </tbody> -->
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex align-items-end flex-column bd-highlight mb-3">
+          <div id="buttonDiv" class="p-2 bd-highlight"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://raw.githack.com/creativetimofficial/argon-dashboard/master/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="https://raw.githack.com/creativetimofficial/argon-dashboard/master/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

@@ -21,7 +21,7 @@ function PlayerPlayable(name, cards, move = false) {
 export default function createGameInstance() {
   const local = {
     waitList: [], // list of players waiting to join the game
-    currentPlayerId: undefined,
+    currentPlayer: {},
     screen: "wait",
   };
 
@@ -55,14 +55,20 @@ export default function createGameInstance() {
     this.local.screen = screen;
   }
 
+  function setCurrentPlayer({ playerId, name, imageURL, admin }) {
+    local.currentPlayer = createPlayerObject(playerId, name, imageURL, admin);
+  }
+
+  function getCurrentPlayer() {
+    return this.local.currentPlayer;
+  }
+
   const gameDefaultState = {
     init: false,
     players: {},
     currentRound: 1,
     rounds: [],
-    currentPlayer: {
-      // playerId: "playerId"
-    },
+    currentPlayer: {},
     currentRoundCartAmount: 1,
     maxRoundCardAmount: 8,
     lastPlayerLastGame: {},
@@ -88,12 +94,8 @@ export default function createGameInstance() {
     Object.assign(state, newState);
   }
 
-  function setCurrentPlayerId(playerId) {
-    local.currentPlayerId = playerId;
-  }
-
   function getCurrentPlayerId() {
-    return local.currentPlayerId;
+    return local.currentPlayer.playerId;
   }
 
   function getPlayers() {
@@ -113,7 +115,7 @@ export default function createGameInstance() {
     const name = command.name;
     const imgUrl = command.imgUrl;
 
-    state.players[playerId] = new PlayerObject(name, imgUrl);
+    state.players[playerId] = createPlayerObject(name, imgUrl);
 
     notifyAll({
       type: "add-player",
@@ -148,12 +150,13 @@ export default function createGameInstance() {
     getWaitList,
     setWaitList,
     setScreenToRender,
+    setCurrentPlayer,
+    getCurrentPlayer,
     // game stuff
     state,
     setState,
     getPlayers,
     initNewRound,
-    setCurrentPlayerId,
     getCurrentPlayerId,
     addPlayer,
     removePlayer,

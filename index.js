@@ -44,7 +44,7 @@ gameInstance.subscribe((command) => {
   sockets.emit(command.type, command);
 });
 
-sockets.on("connection", (socket) => {
+sockets.on("connect", (socket) => {
   const playerId = socket.id;
 
   //get user info from local storage
@@ -63,7 +63,9 @@ sockets.on("connection", (socket) => {
   }
 
   socket.on("disconnect", () => {
-    gameInstance.removePlayerInWaitList({ playerId });
+    if (!gameInstance.isGameRunning()) {
+      gameInstance.removePlayerInWaitList({ playerId });
+    }
   });
 });
 
